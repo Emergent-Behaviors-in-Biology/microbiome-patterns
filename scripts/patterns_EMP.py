@@ -11,8 +11,8 @@ from community_simulator.usertools import MakeConsumerDynamics,MakeResourceDynam
 from community_simulator import Community
 import pickle
 
-folder = '/project/biophys/microbial_crm/data/'
-#folder = '../data/'
+#folder = '/project/biophys/microbial_crm/data/'
+folder = '../data/'
 
 ###############GENERAL SETUP#####################
 mp = {'sampling':'Binary', #Sampling method
@@ -78,3 +78,29 @@ NTraj, Rtraj = EMP.RunExperiment(np.eye(EMP_protocol['n_wells']),1000,10,refresh
 with open(folder+'EMP.dat','wb') as f:
     pickle.dump([EMP.N,EMP.R,params_EMP,EMP.metadata],f)
 print('Finished stage 3.')
+
+########################RANDOM ENVIRONMENTS#############################
+EMP_protocol['food'] = np.random.choice(np.arange(90,dtype=int),size=EMP_protocol['n_wells'])
+#Make initial state
+N0,R0 = MakeInitialState(EMP_protocol)
+init_state=[N0,R0]
+#Update food source
+for k in range(len(N0.T)):
+    params_EMP[k]['R0'] = R0.values[:,k]
+EMP = Community(init_state,dynamics,params_EMP)
+EMP.metadata = pd.DataFrame(np.asarray([np.mean(item['m']) for item in params_EMP]),index=N0.T.index,columns=['m'])
+#Integrate to steady state and save
+print('Starting integration.')
+NTraj, Rtraj = EMP.RunExperiment(np.eye(EMP_protocol['n_wells']),2,10,refresh_resource=False,scale=1e6)
+with open(folder+'EMP2.dat','wb') as f:
+    pickle.dump([EMP.N,EMP.R,params_EMP,EMP.metadata],f)
+print('Finished stage 1.')
+NTraj, Rtraj = EMP.RunExperiment(np.eye(EMP_protocol['n_wells']),100,10,refresh_resource=False,scale=1e6)
+with open(folder+'EMP2.dat','wb') as f:
+    pickle.dump([EMP.N,EMP.R,params_EMP,EMP.metadata],f)
+print('Finished stage 2.')
+NTraj, Rtraj = EMP.RunExperiment(np.eye(EMP_protocol['n_wells']),1000,10,refresh_resource=False,scale=1e6)
+with open(folder+'EMP2.dat','wb') as f:
+    pickle.dump([EMP.N,EMP.R,params_EMP,EMP.metadata],f)
+print('Finished stage 3.')
+

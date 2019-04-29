@@ -11,8 +11,9 @@ from community_simulator.usertools import MakeConsumerDynamics,MakeResourceDynam
 from community_simulator import Community
 import pickle
 
-folder = '/project/biophys/microbial_crm/data/'
-#folder= '../data/'
+#folder = '/project/biophys/microbial_crm/data/'
+folder= '../data/'
+
 n_samples = 300
 R0_food = 1000
 
@@ -58,6 +59,7 @@ alpha = np.linspace(0,1,n_samples)
 for k in range(3):
     R0[2*k*50,k*n_samples:(k+1)*n_samples] = alpha*R0_food
     R0[(2*k+1)*50,k*n_samples:(k+1)*n_samples] = (1-alpha)*R0_food
+R0 = pd.DataFrame(R0,index=D.index,columns=N0.keys())
 init_state=[N0,R0]
 #Make parameter list
 m = 1+0.01*np.random.randn(len(c))
@@ -77,7 +79,7 @@ HMP.metadata = pd.DataFrame(['Env. 1']*n_samples+['Env. 2']*n_samples+['Env. 3']
                             index=N0.T.index,columns=['Environment'])
 
 ###############GET STEADY STATE AND SAVE#####################
-HMP.SteadyState(plot=False,tol=1e-3)
+HMP.SteadyState(plot=False,tol=1e-3,verbose=False)
 with open(folder+'HMP_env_family.dat','wb') as f:
     pickle.dump([HMP.N,HMP.R,params[0],R0,HMP.metadata],f)
 
@@ -86,7 +88,8 @@ HMP_protocol.update({'SA': 6*800+200, #Number of species in each family
     'MA': 6*50, #Number of resources of each type
     'Sgen': 0, #Number of generalist species
     'muc': 10, #Mean sum of consumption rates in Gaussian model
-    'q': 0, #Preference strength (0 for generalist and 1 for specialist)
+    'q': 0,#Preference strength (0 for generalist and 1 for specialist)
+    'waste_type':0
 })
 c,D = MakeMatrices(HMP_protocol)
 N0,R0 = MakeInitialState(HMP_protocol)
@@ -95,6 +98,7 @@ alpha = np.linspace(0,1,n_samples)
 for k in range(3):
     R0[2*k*50,k*n_samples:(k+1)*n_samples] = alpha*R0_food
     R0[(2*k+1)*50,k*n_samples:(k+1)*n_samples] = (1-alpha)*R0_food
+R0 = pd.DataFrame(R0,index=D.index,columns=N0.keys())
 init_state=[N0,R0]
 m = 1+0.01*np.random.randn(len(c))
 params=[{'w':1,
