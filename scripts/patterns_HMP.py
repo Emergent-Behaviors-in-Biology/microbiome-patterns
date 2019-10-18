@@ -80,7 +80,7 @@ for k in range(len(params)):
 HMP = Community(init_state,dynamics,params)
 HMP.metadata = pd.DataFrame(['Site 1']*n_samples+['Site 2']*n_samples+['Site 3']*n_samples,
                             index=N0.T.index,columns=['Environment'])
-HMP.metadata['alpha'] = alpha
+HMP.metadata['alpha'] = np.asarray(list(alpha)*3)
 HMP.SteadyState(plot=False,tol=1e-3,verbose=False)
 with open(folder+'_'.join(['comm']+exp.split(' '))+'S'+str(HMP_protocol['S'])+'.dat','wb') as f:
     pickle.dump([HMP.N,HMP.R,params[0],R0,HMP.metadata],f)
@@ -144,7 +144,7 @@ for k in range(len(params)):
 HMP = Community(init_state,dynamics,params)
 HMP.metadata = pd.DataFrame(['Site 1']*n_samples+['Site 2']*n_samples+['Site 3']*n_samples,
                             index=N0.T.index,columns=['Environment'])
-HMP.metadata['alpha'] = alpha
+HMP.metadata['alpha'] = np.asarray(list(alpha)*3)
 HMP.SteadyState(plot=False,tol=1e-3,verbose=False)
 with open(folder+'_'.join(['comm']+exp.split(' '))+'S'+str(HMP_protocol['S'])+'.dat','wb') as f:
     pickle.dump([HMP.N,HMP.R,params[0],R0,HMP.metadata],f)
