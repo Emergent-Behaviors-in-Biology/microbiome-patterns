@@ -7,7 +7,7 @@ Created on Tue Dec 19 17:23:10 2017
 """
 import pandas as pd
 import numpy as np
-from community_simulator.usertools import MakeConsumerDynamics,MakeResourceDynamics,MakeMatrices,MakeInitialState
+from community_simulator.usertools import BinaryRandomMatrix,MakeConsumerDynamics,MakeResourceDynamics,MakeMatrices,MakeInitialState
 from community_simulator import Community
 import pickle
 
@@ -48,7 +48,7 @@ metadata = {}
 ## Set up shared parameters
 HMP_protocol = {'R0_food':R0_food, #unperturbed fixed point for supplied food
                 'n_wells':3*n_samples, #Number of independent wells
-                'S':4000, #Number of species per well
+                'S':4900, #Number of species per well
                 'food':0 #index of food source
                 }
 HMP_protocol.update(mp)
@@ -80,6 +80,7 @@ for k in range(len(params)):
 HMP = Community(init_state,dynamics,params)
 HMP.metadata = pd.DataFrame(['Site 1']*n_samples+['Site 2']*n_samples+['Site 3']*n_samples,
                             index=N0.T.index,columns=['Environment'])
+HMP.metadata['alpha'] = alpha
 HMP.SteadyState(plot=False,tol=1e-3,verbose=False)
 with open(folder+'_'.join(['comm']+exp.split(' '))+'S'+str(HMP_protocol['S'])+'.dat','wb') as f:
     pickle.dump([HMP.N,HMP.R,params[0],R0,HMP.metadata],f)
@@ -120,6 +121,7 @@ HMP.metadata.to_csv(folder+'_'.join(['m']+exp.split(' '))+'S'+str(HMP_protocol['
 #############Random Axis####################
 exp = 'Random Axis HMP'
 R0 = np.zeros(np.shape(R0))
+alpha = np.random.rand(n_samples)
 for k in range(3):
     R0_temp = BinaryRandomMatrix(mp['MA'].sum(),2,1/6)
     R0_temp = (R0_temp/R0_temp.sum(axis=0))*R0_food
@@ -142,6 +144,7 @@ for k in range(len(params)):
 HMP = Community(init_state,dynamics,params)
 HMP.metadata = pd.DataFrame(['Site 1']*n_samples+['Site 2']*n_samples+['Site 3']*n_samples,
                             index=N0.T.index,columns=['Environment'])
+HMP.metadata['alpha'] = alpha
 HMP.SteadyState(plot=False,tol=1e-3,verbose=False)
 with open(folder+'_'.join(['comm']+exp.split(' '))+'S'+str(HMP_protocol['S'])+'.dat','wb') as f:
     pickle.dump([HMP.N,HMP.R,params[0],R0,HMP.metadata],f)
