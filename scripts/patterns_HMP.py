@@ -11,8 +11,8 @@ from community_simulator.usertools import BinaryRandomMatrix,MakeConsumerDynamic
 from community_simulator import Community
 import pickle
 
-folder = '/project/biophys/microbial_crm/data/'
-#folder= '../data/'
+#folder = '/project/biophys/microbial_crm/data/'
+folder= '../data/'
 
 n_samples = 300
 R0_food = 1000

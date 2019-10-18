@@ -14,7 +14,6 @@ import pickle
 #folder = '/project/biophys/microbial_crm/data/'
 folder = '../data/'
 
-###############GENERAL SETUP#####################
 mp = {'sampling':'Binary', #Sampling method
     'SA': 180, #Number of species in each family
     'MA': 90, #Number of resources of each type
@@ -39,7 +38,7 @@ dynamics = [dNdt,dRdt]
 #Construct matrices
 c,D = MakeMatrices(mp)
 
-#################CONSTANT ENVIRONMENT######################
+## Set up shared parameters
 EMP_protocol = {'R0_food':200, #unperturbed fixed point for supplied food
                 'n_wells':300, #Number of independent wells
                 'S':150, #Number of species per well
@@ -53,6 +52,11 @@ nwells = len(N0.T)
 init_state=[N0,R0]
 #Make parameter list
 m0 = 0.5+0.01*np.random.randn(len(c))
+N = {}
+metadata = {}
+
+### Crossfeeding, one external resource
+exp = 'One resource EMP'
 params_EMP=[{'c':c,
             'm':m0+10*np.random.rand(),
             'w':1,
@@ -63,44 +67,50 @@ params_EMP=[{'c':c,
             'tau':1
             } for k in range(len(N0.T))]
 EMP = Community(init_state,dynamics,params_EMP)
-EMP.metadata = pd.DataFrame(np.asarray([np.mean(item['m']) for item in params_EMP]),index=N0.T.index,columns=['m'])
-#Integrate to steady state and save
-print('Starting integration.')
-NTraj, Rtraj = EMP.RunExperiment(np.eye(EMP_protocol['n_wells']),2,10,refresh_resource=False,scale=1e6)
-with open(folder+'EMP.dat','wb') as f:
-    pickle.dump([EMP.N,EMP.R,params_EMP,EMP.metadata],f)
-print('Finished stage 1.')
-NTraj, Rtraj = EMP.RunExperiment(np.eye(EMP_protocol['n_wells']),100,10,refresh_resource=False,scale=1e6)
-with open(folder+'EMP.dat','wb') as f:
-    pickle.dump([EMP.N,EMP.R,params_EMP,EMP.metadata],f)
-print('Finished stage 2.')
-NTraj, Rtraj = EMP.RunExperiment(np.eye(EMP_protocol['n_wells']),1000,10,refresh_resource=False,scale=1e6)
-with open(folder+'EMP.dat','wb') as f:
-    pickle.dump([EMP.N,EMP.R,params_EMP,EMP.metadata],f)
-print('Finished stage 3.')
+metadata = pd.DataFrame(np.asarray([np.mean(item['m']) for item in params_EMP]),index=N0.T.index,columns=['m'])
+EMP.SteadyState()
+EMP.N.to_csv(folder+'_'.join(['N']+exp.split(' '))+'.csv')
+metadata.to_csv(folder+'_'.join(['m']+exp.split(' '))+'.csv')
 
-########################RANDOM ENVIRONMENTS#############################
-EMP_protocol['food'] = np.random.choice(np.arange(90,dtype=int),size=EMP_protocol['n_wells'])
-#Make initial state
-N0,R0 = MakeInitialState(EMP_protocol)
-init_state=[N0,R0]
-#Update food source
-for k in range(len(N0.T)):
-    params_EMP[k]['R0'] = R0.values[:,k]
+### Crossfeeding, all external resources
+exp = 'All resources EMP'
+params_EMP=[{'c':c,
+            'm':m0+10*np.random.rand(),
+            'w':1,
+            'D':D,
+            'g':1,
+            'l':0.8,
+            'R0':np.ones(len(R0))*EMP_protocol['R0_food']/len(R0),
+            'tau':1
+            } for k in range(len(N0.T))]
 EMP = Community(init_state,dynamics,params_EMP)
-EMP.metadata = pd.DataFrame(np.asarray([np.mean(item['m']) for item in params_EMP]),index=N0.T.index,columns=['m'])
-#Integrate to steady state and save
-print('Starting integration.')
-NTraj, Rtraj = EMP.RunExperiment(np.eye(EMP_protocol['n_wells']),2,10,refresh_resource=False,scale=1e6)
-with open(folder+'EMP2.dat','wb') as f:
-    pickle.dump([EMP.N,EMP.R,params_EMP,EMP.metadata],f)
-print('Finished stage 1.')
-NTraj, Rtraj = EMP.RunExperiment(np.eye(EMP_protocol['n_wells']),100,10,refresh_resource=False,scale=1e6)
-with open(folder+'EMP2.dat','wb') as f:
-    pickle.dump([EMP.N,EMP.R,params_EMP,EMP.metadata],f)
-print('Finished stage 2.')
-NTraj, Rtraj = EMP.RunExperiment(np.eye(EMP_protocol['n_wells']),1000,10,refresh_resource=False,scale=1e6)
-with open(folder+'EMP2.dat','wb') as f:
-    pickle.dump([EMP.N,EMP.R,params_EMP,EMP.metadata],f)
-print('Finished stage 3.')
+metadata = pd.DataFrame(np.asarray([np.mean(item['m']) for item in params_EMP]),index=N0.T.index,columns=['m'])
+EMP.SteadyState()
+EMP.N.to_csv(folder+'_'.join(['N']+exp.split(' '))+'.csv')
+metadata.to_csv(folder+'_'.join(['m']+exp.split(' '))+'.csv')
 
+## Dispersal-Limited
+exp = 'Dispersal limited'
+N0,R0 = MakeInitialState(EMP_protocol)
+select = np.zeros(np.shape(N0))
+for k in range(len(N0.T)):
+    idx = np.random.choice(range(len(N0)),replace=False,size=np.random.randint(len(N0)))
+    select[idx,k] = 1
+N0 = N0*select
+Stot = len(N0)
+nwells = len(N0.T)
+init_state=[N0,R0]
+params_EMP=[{'c':c,
+            'm':m0,
+            'w':1,
+            'D':D,
+            'g':1,
+            'l':0.8,
+            'R0':R0.values[:,k],
+            'tau':1
+            } for k in range(len(N0.T))]
+EMP = Community(init_state,dynamics,params_EMP)
+metadata = pd.DataFrame(np.asarray([np.mean(item['m']) for item in params_EMP]),index=N0.T.index,columns=['m'])
+EMP.SteadyState()
+EMP.N.to_csv(folder+'_'.join(['N']+exp.split(' '))+'.csv')
+metadata.to_csv(folder+'_'.join(['m']+exp.split(' '))+'.csv')
