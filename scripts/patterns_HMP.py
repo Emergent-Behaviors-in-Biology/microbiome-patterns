@@ -11,8 +11,8 @@ from community_simulator.usertools import BinaryRandomMatrix,MakeConsumerDynamic
 from community_simulator import Community
 import pickle
 
-#folder = '/project/biophys/microbial_crm/data/'
-folder= '../data/'
+folder = '/project/biophys/microbial_crm/data/'
+#folder= '../data/'
 
 n_samples = 300
 R0_food = 1000
@@ -48,7 +48,7 @@ metadata = {}
 ## Set up shared parameters
 HMP_protocol = {'R0_food':R0_food, #unperturbed fixed point for supplied food
                 'n_wells':3*n_samples, #Number of independent wells
-                'S':4900, #Number of species per well
+                'S':2500, #Number of species per well
                 'food':0 #index of food source
                 }
 HMP_protocol.update(mp)
