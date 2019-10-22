@@ -71,6 +71,8 @@ metadata = pd.DataFrame(np.asarray([np.mean(item['m']) for item in params_EMP]),
 EMP.SteadyState()
 EMP.N.to_csv(folder+'_'.join(['N']+exp.split(' '))+'.csv')
 metadata.to_csv(folder+'_'.join(['m']+exp.split(' '))+'.csv')
+with open(folder+'_'.join(['comm']+exp.split(' '))+'.dat','wb') as f:
+    pickle.dump([EMP.N,EMP.R,params_EMP[0],R0,metadata],f)
 
 ### Crossfeeding, all external resources
 exp = 'All resources EMP'
@@ -88,6 +90,8 @@ metadata = pd.DataFrame(np.asarray([np.mean(item['m']) for item in params_EMP]),
 EMP.SteadyState()
 EMP.N.to_csv(folder+'_'.join(['N']+exp.split(' '))+'.csv')
 metadata.to_csv(folder+'_'.join(['m']+exp.split(' '))+'.csv')
+with open(folder+'_'.join(['comm']+exp.split(' '))+'.dat','wb') as f:
+    pickle.dump([EMP.N,EMP.R,params_EMP[0],R0,metadata],f)
 
 ## Dispersal-Limited
 exp = 'Dispersal limited'
@@ -114,3 +118,5 @@ metadata = pd.DataFrame(np.asarray([np.mean(item['m']) for item in params_EMP]),
 EMP.SteadyState()
 EMP.N.to_csv(folder+'_'.join(['N']+exp.split(' '))+'.csv')
 metadata.to_csv(folder+'_'.join(['m']+exp.split(' '))+'.csv')
+with open(folder+'_'.join(['comm']+exp.split(' '))+'.dat','wb') as f:
+    pickle.dump([EMP.N,EMP.R,params_EMP[0],R0,metadata],f)
