@@ -14,6 +14,13 @@ import pickle
 folder = '/project/biophys/microbial_crm/data/'
 #folder= '../data/'
 
+def filename(kind,exp,S,folder = folder):
+    if kind == 'comm':
+        suff = '.dat'
+    else:
+        suff = '.csv'
+    return folder+'_'.join([kind]+exp.split(' ')+['S'])+str(S)+suff
+
 n_samples = 300
 R0_food = 1000
 
@@ -56,7 +63,7 @@ HMP_protocol.update(mp)
 N0,R0 = MakeInitialState(HMP_protocol)
 
 ################Two external resources####################
-exp = 'Two resource HMP'
+exp = 'Simple Environments'
 R0 = np.zeros(np.shape(R0))
 alpha = np.random.rand(n_samples)
 for k in range(3):
@@ -82,13 +89,13 @@ HMP.metadata = pd.DataFrame(['Site 1']*n_samples+['Site 2']*n_samples+['Site 3']
                             index=N0.T.index,columns=['Environment'])
 HMP.metadata['alpha'] = np.asarray(list(alpha)*3)
 HMP.SteadyState(plot=False,tol=1e-3,verbose=False)
-with open(folder+'_'.join(['comm']+exp.split(' '))+'S'+str(HMP_protocol['S'])+'.dat','wb') as f:
+with open(filename('comm',exp,HMP_protocol['S']),'wb') as f:
     pickle.dump([HMP.N,HMP.R,params[0],R0,HMP.metadata],f)
-HMP.N.to_csv(folder+'_'.join(['N']+exp.split(' '))+'S'+str(HMP_protocol['S'])+'.csv')
-HMP.metadata.to_csv(folder+'_'.join(['m']+exp.split(' '))+'S'+str(HMP_protocol['S'])+'.csv')
+HMP.N.to_csv(filename('N',exp,HMP_protocol['S']))
+HMP.metadata.to_csv(filename('m',exp,HMP_protocol['S']))
 
 #############All external resources####################
-exp = 'All resource HMP'
+exp = 'Complex environments'
 R0 = np.zeros(np.shape(R0))
 for k in range(3):
     R0_temp = np.random.rand(mp['MA'][2*k]+mp['MA'][2*k+1],n_samples)
@@ -113,13 +120,13 @@ HMP = Community(init_state,dynamics,params)
 HMP.metadata = pd.DataFrame(['Site 1']*n_samples+['Site 2']*n_samples+['Site 3']*n_samples,
                             index=N0.T.index,columns=['Environment'])
 HMP.SteadyState(plot=False,tol=1e-3,verbose=False)
-with open(folder+'_'.join(['comm']+exp.split(' '))+'S'+str(HMP_protocol['S'])+'.dat','wb') as f:
+with open(filename('comm',exp,HMP_protocol['S']),'wb') as f:
     pickle.dump([HMP.N,HMP.R,params[0],R0,HMP.metadata],f)
-HMP.N.to_csv(folder+'_'.join(['N']+exp.split(' '))+'S'+str(HMP_protocol['S'])+'.csv')
-HMP.metadata.to_csv(folder+'_'.join(['m']+exp.split(' '))+'S'+str(HMP_protocol['S'])+'.csv')
+HMP.N.to_csv(filename('N',exp,HMP_protocol['S']))
+HMP.metadata.to_csv(filename('m',exp,HMP_protocol['S']))
 
 #############Random Axis####################
-exp = 'Random Axis HMP'
+exp = 'Metabolically overlapping'
 R0 = np.zeros(np.shape(R0))
 alpha = np.random.rand(n_samples)
 for k in range(3):
@@ -146,13 +153,13 @@ HMP.metadata = pd.DataFrame(['Site 1']*n_samples+['Site 2']*n_samples+['Site 3']
                             index=N0.T.index,columns=['Environment'])
 HMP.metadata['alpha'] = np.asarray(list(alpha)*3)
 HMP.SteadyState(plot=False,tol=1e-3,verbose=False)
-with open(folder+'_'.join(['comm']+exp.split(' '))+'S'+str(HMP_protocol['S'])+'.dat','wb') as f:
+with open(filename('comm',exp,HMP_protocol['S']),'wb') as f:
     pickle.dump([HMP.N,HMP.R,params[0],R0,HMP.metadata],f)
-HMP.N.to_csv(folder+'_'.join(['N']+exp.split(' '))+'S'+str(HMP_protocol['S'])+'.csv')
-HMP.metadata.to_csv(folder+'_'.join(['m']+exp.split(' '))+'S'+str(HMP_protocol['S'])+'.csv')
+HMP.N.to_csv(filename('N',exp,HMP_protocol['S']))
+HMP.metadata.to_csv(filename('m',exp,HMP_protocol['S']))
 
 ################No family####################
-exp = 'No family HMP'
+exp = 'No taxonomic structure'
 mp['q'] = 0
 c,D = MakeMatrices(mp)
 R0 = np.zeros(np.shape(R0))
@@ -180,7 +187,7 @@ HMP.metadata = pd.DataFrame(['Site 1']*n_samples+['Site 2']*n_samples+['Site 3']
                             index=N0.T.index,columns=['Environment'])
 HMP.metadata['alpha'] = np.asarray(list(alpha)*3)
 HMP.SteadyState(plot=False,tol=1e-3,verbose=False)
-with open(folder+'_'.join(['comm']+exp.split(' '))+'S'+str(HMP_protocol['S'])+'.dat','wb') as f:
+with open(filename('comm',exp,HMP_protocol['S']),'wb') as f:
     pickle.dump([HMP.N,HMP.R,params[0],R0,HMP.metadata],f)
-HMP.N.to_csv(folder+'_'.join(['N']+exp.split(' '))+'S'+str(HMP_protocol['S'])+'.csv')
-HMP.metadata.to_csv(folder+'_'.join(['m']+exp.split(' '))+'S'+str(HMP_protocol['S'])+'.csv')
+HMP.N.to_csv(filename('N',exp,HMP_protocol['S']))
+HMP.metadata.to_csv(filename('m',exp,HMP_protocol['S']))

@@ -56,7 +56,7 @@ for well in wells:
     Ainv = pd.DataFrame(np.linalg.inv(A),index=A.index,columns=A.keys())
     alpha = ((c*(1-params['l'])).dot(Ainv).dot(Q).dot((c*R[well]).T))
     alpha_list.append((alpha.T/np.diag(alpha)).T.values)
-    K_list.append((alpha.dot(N[well])/np.diag(alpha)).values)
+    K_list.append((alpha.dot(N[well])/np.diag(alpha)).values-params['m'])
     
 #Subsample community pairs
 pairs = []

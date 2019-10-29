@@ -14,6 +14,13 @@ import pickle
 #folder = '/project/biophys/microbial_crm/data/'
 folder = '../data/'
 
+def filename(kind,exp,S,folder = folder):
+    if kind == 'comm':
+        suff = '.dat'
+    else:
+        suff = '.csv'
+    return folder+'_'.join([kind]+exp.split(' ')+['S'])+str(S)+suff
+
 mp = {'sampling':'Binary', #Sampling method
     'SA': 180, #Number of species in each family
     'MA': 90, #Number of resources of each type
@@ -56,7 +63,7 @@ N = {}
 metadata = {}
 
 ### Crossfeeding, one external resource
-exp = 'One resource EMP'
+exp = 'Simple environment'
 params_EMP=[{'c':c,
             'm':m0+10*np.random.rand(),
             'w':1,
@@ -69,13 +76,13 @@ params_EMP=[{'c':c,
 EMP = Community(init_state,dynamics,params_EMP)
 metadata = pd.DataFrame(np.asarray([np.mean(item['m']) for item in params_EMP]),index=N0.T.index,columns=['m'])
 EMP.SteadyState()
-EMP.N.to_csv(folder+'_'.join(['N']+exp.split(' '))+'.csv')
-metadata.to_csv(folder+'_'.join(['m']+exp.split(' '))+'.csv')
-with open(folder+'_'.join(['comm']+exp.split(' '))+'.dat','wb') as f:
+EMP.N.to_csv(filename('N',exp,EMP_protocol['S']))
+metadata.to_csv(filename('m',exp,EMP_protocol['S']))
+with open(filename('comm',exp,EMP_protocol['S']),'wb') as f:
     pickle.dump([EMP.N,EMP.R,params_EMP[0],R0,metadata],f)
 
 ### Crossfeeding, all external resources
-exp = 'All resources EMP'
+exp = 'Complex environment'
 params_EMP=[{'c':c,
             'm':m0+10*np.random.rand(),
             'w':1,
@@ -88,9 +95,9 @@ params_EMP=[{'c':c,
 EMP = Community(init_state,dynamics,params_EMP)
 metadata = pd.DataFrame(np.asarray([np.mean(item['m']) for item in params_EMP]),index=N0.T.index,columns=['m'])
 EMP.SteadyState()
-EMP.N.to_csv(folder+'_'.join(['N']+exp.split(' '))+'.csv')
-metadata.to_csv(folder+'_'.join(['m']+exp.split(' '))+'.csv')
-with open(folder+'_'.join(['comm']+exp.split(' '))+'.dat','wb') as f:
+EMP.N.to_csv(filename('N',exp,EMP_protocol['S']))
+metadata.to_csv(filename('m',exp,EMP_protocol['S']))
+with open(filename('comm',exp,EMP_protocol['S']),'wb') as f:
     pickle.dump([EMP.N,EMP.R,params_EMP[0],R0,metadata],f)
 
 ## Dispersal-Limited
@@ -116,7 +123,7 @@ params_EMP=[{'c':c,
 EMP = Community(init_state,dynamics,params_EMP)
 metadata = pd.DataFrame(np.asarray([np.mean(item['m']) for item in params_EMP]),index=N0.T.index,columns=['m'])
 EMP.SteadyState()
-EMP.N.to_csv(folder+'_'.join(['N']+exp.split(' '))+'.csv')
-metadata.to_csv(folder+'_'.join(['m']+exp.split(' '))+'.csv')
-with open(folder+'_'.join(['comm']+exp.split(' '))+'.dat','wb') as f:
+EMP.N.to_csv(filename('N',exp,EMP_protocol['S']))
+metadata.to_csv(filename('m',exp,EMP_protocol['S']))
+with open(filename('comm',exp,EMP_protocol['S']),'wb') as f:
     pickle.dump([EMP.N,EMP.R,params_EMP[0],R0,metadata],f)
