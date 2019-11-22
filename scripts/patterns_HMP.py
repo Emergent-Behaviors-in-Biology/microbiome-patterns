@@ -62,68 +62,68 @@ HMP_protocol.update(mp)
 #Make initial state
 N0,R0 = MakeInitialState(HMP_protocol)
 
-# ################Two external resources####################
-# exp = 'Simple Environments'
-# R0 = np.zeros(np.shape(R0))
-# alpha = np.random.rand(n_samples)
-# for k in range(3):
-#     R0[2*k*50,k*n_samples:(k+1)*n_samples] = alpha*R0_food
-#     R0[(2*k+1)*50,k*n_samples:(k+1)*n_samples] = (1-alpha)*R0_food
-# R0 = pd.DataFrame(R0,index=D.index,columns=N0.keys())
-# init_state=[N0,R0]
-# #Make parameter list
-# m = 1+0.01*np.random.randn(len(c))
-# params=[{'w':1,
-#         'g':1,
-#         'l':0.8,
-#         'R0':R0.values[:,k],
-#         'r':1.,
-#         'tau':1
-#         } for k in range(len(N0.T))]
-# for k in range(len(params)):
-#     params[k]['c'] = c
-#     params[k]['D'] = D
-#     params[k]['m'] = m
-# HMP = Community(init_state,dynamics,params)
-# HMP.metadata = pd.DataFrame(['Site 1']*n_samples+['Site 2']*n_samples+['Site 3']*n_samples,
-#                             index=N0.T.index,columns=['Environment'])
-# HMP.metadata['alpha'] = np.asarray(list(alpha)*3)
-# HMP.SteadyState(plot=False,tol=1e-3,verbose=False)
-# with open(filename('comm',exp,HMP_protocol['S']),'wb') as f:
-#     pickle.dump([HMP.N,HMP.R,params[0],R0,HMP.metadata],f)
-# HMP.N.to_csv(filename('N',exp,HMP_protocol['S']))
-# HMP.metadata.to_csv(filename('m',exp,HMP_protocol['S']))
+################Two external resources####################
+exp = 'Simple Environments'
+R0 = np.zeros(np.shape(R0))
+alpha = np.random.rand(n_samples)
+for k in range(3):
+    R0[2*k*50,k*n_samples:(k+1)*n_samples] = alpha*R0_food
+    R0[(2*k+1)*50,k*n_samples:(k+1)*n_samples] = (1-alpha)*R0_food
+R0 = pd.DataFrame(R0,index=D.index,columns=N0.keys())
+init_state=[N0,R0]
+#Make parameter list
+m = 1+0.01*np.random.randn(len(c))
+params=[{'w':1,
+        'g':1,
+        'l':0.8,
+        'R0':R0.values[:,k],
+        'r':1.,
+        'tau':1
+        } for k in range(len(N0.T))]
+for k in range(len(params)):
+    params[k]['c'] = c
+    params[k]['D'] = D
+    params[k]['m'] = m
+HMP = Community(init_state,dynamics,params)
+HMP.metadata = pd.DataFrame(['Site 1']*n_samples+['Site 2']*n_samples+['Site 3']*n_samples,
+                            index=N0.T.index,columns=['Environment'])
+HMP.metadata['alpha'] = np.asarray(list(alpha)*3)
+HMP.SteadyState(plot=False,tol=1e-3,verbose=False)
+with open(filename('comm',exp,HMP_protocol['S']),'wb') as f:
+    pickle.dump([HMP.N,HMP.R,params[0],R0,HMP.metadata],f)
+HMP.N.to_csv(filename('N',exp,HMP_protocol['S']))
+HMP.metadata.to_csv(filename('m',exp,HMP_protocol['S']))
 
-# #############All external resources####################
-# exp = 'Complex environments'
-# R0 = np.zeros(np.shape(R0))
-# for k in range(3):
-#     R0_temp = np.random.rand(mp['MA'][2*k]+mp['MA'][2*k+1],n_samples)
-#     R0_temp = (R0_temp/R0_temp.sum(axis=0))*R0_food
-#     R0[mp['MA'][:2*k].sum():mp['MA'][:2*(k+1)].sum(),k*n_samples:(k+1)*n_samples] = R0_temp
-# R0 = pd.DataFrame(R0,index=D.index,columns=N0.keys())
-# init_state=[N0,R0]
-# #Make parameter list
-# m = 1+0.01*np.random.randn(len(c))
-# params=[{'w':1,
-#         'g':1,
-#         'l':0.8,
-#         'R0':R0.values[:,k],
-#         'r':1.,
-#         'tau':1
-#         } for k in range(len(N0.T))]
-# for k in range(len(params)):
-#     params[k]['c'] = c
-#     params[k]['D'] = D
-#     params[k]['m'] = m
-# HMP = Community(init_state,dynamics,params)
-# HMP.metadata = pd.DataFrame(['Site 1']*n_samples+['Site 2']*n_samples+['Site 3']*n_samples,
-#                             index=N0.T.index,columns=['Environment'])
-# HMP.SteadyState(plot=False,tol=1e-3,verbose=False)
-# with open(filename('comm',exp,HMP_protocol['S']),'wb') as f:
-#     pickle.dump([HMP.N,HMP.R,params[0],R0,HMP.metadata],f)
-# HMP.N.to_csv(filename('N',exp,HMP_protocol['S']))
-# HMP.metadata.to_csv(filename('m',exp,HMP_protocol['S']))
+#############All external resources####################
+exp = 'Complex environments'
+R0 = np.zeros(np.shape(R0))
+for k in range(3):
+    R0_temp = np.random.rand(mp['MA'][2*k]+mp['MA'][2*k+1],n_samples)
+    R0_temp = (R0_temp/R0_temp.sum(axis=0))*R0_food
+    R0[mp['MA'][:2*k].sum():mp['MA'][:2*(k+1)].sum(),k*n_samples:(k+1)*n_samples] = R0_temp
+R0 = pd.DataFrame(R0,index=D.index,columns=N0.keys())
+init_state=[N0,R0]
+#Make parameter list
+m = 1+0.01*np.random.randn(len(c))
+params=[{'w':1,
+        'g':1,
+        'l':0.8,
+        'R0':R0.values[:,k],
+        'r':1.,
+        'tau':1
+        } for k in range(len(N0.T))]
+for k in range(len(params)):
+    params[k]['c'] = c
+    params[k]['D'] = D
+    params[k]['m'] = m
+HMP = Community(init_state,dynamics,params)
+HMP.metadata = pd.DataFrame(['Site 1']*n_samples+['Site 2']*n_samples+['Site 3']*n_samples,
+                            index=N0.T.index,columns=['Environment'])
+HMP.SteadyState(plot=False,tol=1e-3,verbose=False)
+with open(filename('comm',exp,HMP_protocol['S']),'wb') as f:
+    pickle.dump([HMP.N,HMP.R,params[0],R0,HMP.metadata],f)
+HMP.N.to_csv(filename('N',exp,HMP_protocol['S']))
+HMP.metadata.to_csv(filename('m',exp,HMP_protocol['S']))
 
 #############Metabolically overlapping####################
 exp = 'Metabolically overlapping'
@@ -152,43 +152,42 @@ for k in range(len(params)):
 HMP = Community(init_state,dynamics,params)
 HMP.metadata = pd.DataFrame(['Site 1']*n_samples+['Site 2']*n_samples+['Site 3']*n_samples,
                             index=N0.T.index,columns=['Environment'])
-HMP.metadata['alpha'] = np.asarray(list(alpha)*3)
 HMP.SteadyState(plot=False,tol=1e-3,verbose=False)
 with open(filename('comm',exp,HMP_protocol['S']),'wb') as f:
     pickle.dump([HMP.N,HMP.R,params[0],R0,HMP.metadata],f)
 HMP.N.to_csv(filename('N',exp,HMP_protocol['S']))
 HMP.metadata.to_csv(filename('m',exp,HMP_protocol['S']))
 
-# ################No family####################
-# exp = 'No taxonomic structure'
-# mp['q'] = 0
-# c,D = MakeMatrices(mp)
-# R0 = np.zeros(np.shape(R0))
-# alpha = np.random.rand(n_samples)
-# for k in range(3):
-#     R0[2*k*50,k*n_samples:(k+1)*n_samples] = alpha*R0_food
-#     R0[(2*k+1)*50,k*n_samples:(k+1)*n_samples] = (1-alpha)*R0_food
-# R0 = pd.DataFrame(R0,index=D.index,columns=N0.keys())
-# init_state=[N0,R0]
-# #Make parameter list
-# m = 1+0.01*np.random.randn(len(c))
-# params=[{'w':1,
-#         'g':1,
-#         'l':0.8,
-#         'R0':R0.values[:,k],
-#         'r':1.,
-#         'tau':1
-#         } for k in range(len(N0.T))]
-# for k in range(len(params)):
-#     params[k]['c'] = c
-#     params[k]['D'] = D
-#     params[k]['m'] = m
-# HMP = Community(init_state,dynamics,params)
-# HMP.metadata = pd.DataFrame(['Site 1']*n_samples+['Site 2']*n_samples+['Site 3']*n_samples,
-#                             index=N0.T.index,columns=['Environment'])
-# HMP.metadata['alpha'] = np.asarray(list(alpha)*3)
-# HMP.SteadyState(plot=False,tol=1e-3,verbose=False)
-# with open(filename('comm',exp,HMP_protocol['S']),'wb') as f:
-#     pickle.dump([HMP.N,HMP.R,params[0],R0,HMP.metadata],f)
-# HMP.N.to_csv(filename('N',exp,HMP_protocol['S']))
-# HMP.metadata.to_csv(filename('m',exp,HMP_protocol['S']))
+################No family####################
+exp = 'No taxonomic structure'
+mp['q'] = 0
+c,D = MakeMatrices(mp)
+R0 = np.zeros(np.shape(R0))
+alpha = np.random.rand(n_samples)
+for k in range(3):
+    R0[2*k*50,k*n_samples:(k+1)*n_samples] = alpha*R0_food
+    R0[(2*k+1)*50,k*n_samples:(k+1)*n_samples] = (1-alpha)*R0_food
+R0 = pd.DataFrame(R0,index=D.index,columns=N0.keys())
+init_state=[N0,R0]
+#Make parameter list
+m = 1+0.01*np.random.randn(len(c))
+params=[{'w':1,
+        'g':1,
+        'l':0.8,
+        'R0':R0.values[:,k],
+        'r':1.,
+        'tau':1
+        } for k in range(len(N0.T))]
+for k in range(len(params)):
+    params[k]['c'] = c
+    params[k]['D'] = D
+    params[k]['m'] = m
+HMP = Community(init_state,dynamics,params)
+HMP.metadata = pd.DataFrame(['Site 1']*n_samples+['Site 2']*n_samples+['Site 3']*n_samples,
+                            index=N0.T.index,columns=['Environment'])
+HMP.metadata['alpha'] = np.asarray(list(alpha)*3)
+HMP.SteadyState(plot=False,tol=1e-3,verbose=False)
+with open(filename('comm',exp,HMP_protocol['S']),'wb') as f:
+    pickle.dump([HMP.N,HMP.R,params[0],R0,HMP.metadata],f)
+HMP.N.to_csv(filename('N',exp,HMP_protocol['S']))
+HMP.metadata.to_csv(filename('m',exp,HMP_protocol['S']))
