@@ -127,3 +127,31 @@ EMP.N.to_csv(filename('N',exp,EMP_protocol['S']))
 metadata.to_csv(filename('m',exp,EMP_protocol['S']))
 with open(filename('comm',exp,EMP_protocol['S']),'wb') as f:
     pickle.dump([EMP.N,EMP.R,params_EMP[0],R0,metadata],f)
+
+## Dispersal and selection
+exp = 'Dispersal and selection'
+N0,R0 = MakeInitialState(EMP_protocol)
+select = np.zeros(np.shape(N0))
+for k in range(len(N0.T)):
+    idx = np.random.choice(range(len(N0)),replace=False,size=np.random.randint(len(N0)))
+    select[idx,k] = 1
+N0 = N0*select
+Stot = len(N0)
+nwells = len(N0.T)
+init_state=[N0,R0]
+params_EMP=[{'c':c,
+            'm':m0+10*np.random.rand(),
+            'w':1,
+            'D':D,
+            'g':1,
+            'l':0.8,
+            'R0':R0.values[:,k],
+            'tau':1
+            } for k in range(len(N0.T))]
+EMP = Community(init_state,dynamics,params_EMP)
+metadata = pd.DataFrame(np.asarray([np.mean(item['m']) for item in params_EMP]),index=N0.T.index,columns=['m'])
+EMP.SteadyState()
+EMP.N.to_csv(filename('N',exp,EMP_protocol['S']))
+metadata.to_csv(filename('m',exp,EMP_protocol['S']))
+with open(filename('comm',exp,EMP_protocol['S']),'wb') as f:
+    pickle.dump([EMP.N,EMP.R,params_EMP[0],R0,metadata],f)
