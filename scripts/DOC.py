@@ -7,7 +7,7 @@ import pickle
 #Choose data to analyze
 folder = '../data/'
 S = 2500
-exp = 'Two resource HMP'
+exp = 'Simple Environments'
 env = 'Site 1'
 thresh = 1e-4
 
@@ -29,7 +29,7 @@ def O(x,y,thresh=0):
     return 0.5*(xtilde[S]+ytilde[S]).sum()
 
 #Load data
-with open(folder+'_'.join(['comm']+exp.split(' '))+'S'+str(S)+'.dat','rb') as f:
+with open(folder+'_'.join(['comm']+exp.split(' ')+['S'+str(S)])+'.dat','rb') as f:
     N,R,params,R0,metadata = pickle.load(f)
 #Remove failed runs
 metadata = metadata[np.isnan(N).sum()==0]
@@ -49,15 +49,16 @@ c = pd.DataFrame(params['c'],index=N.index,columns=R.index)
 Q = np.eye(M) - Dmat*params['l']
 
 #Compute Lotka-Volterra parameters for all wells
-alpha_list = []
+#alpha_list = []
 K_list = []
 for well in wells:
     A = np.eye(M) + Q*(c.T.dot(N[well]))
     Ainv = pd.DataFrame(np.linalg.inv(A),index=A.index,columns=A.keys())
     alpha = ((c*(1-params['l'])).dot(Ainv).dot(Q).dot((c*R[well]).T))
-    alpha_list.append((alpha.T/np.diag(alpha)).T.values)
-    K_list.append((alpha.dot(N[well])/np.diag(alpha)).values-params['m'])
-    
+    #alpha_list.append((alpha.T/np.diag(alpha)).T.values)
+    K_list.append((alpha.dot(N[well]).values-params['m'])/np.diag(alpha))
+print('LV params done')   
+
 #Subsample community pairs
 pairs = []
 for run1 in range(len(N.T)):
@@ -65,10 +66,12 @@ for run1 in range(len(N.T)):
         pairs.append((run1,run2))
 subsample = np.random.choice(np.arange(len(pairs),dtype=int),size=10000)
 pairs = np.asarray(pairs)[subsample]
+print('Subsampling done')
+
 #Compute dissimilarity and overlap
 Dlist = []
 Olist = []
-alpha_diff = []
+#alpha_diff = []
 K_diff = []
 pair_save = []
 for item in range(len(pairs)):
@@ -86,16 +89,18 @@ for item in range(len(pairs)):
             
         shared = ((N[well1]>thresh)&(N[well2]>thresh)).values
             
-        alpha1 = alpha_list[run1][shared,:]
-        alpha1 = alpha1[:,shared]
-        alpha2 = alpha_list[run2][shared,:]
-        alpha2 = alpha2[:,shared]
+        #alpha1 = alpha_list[run1][shared,:]
+        #alpha1 = alpha1[:,shared]
+        #alpha2 = alpha_list[run2][shared,:]
+        #alpha2 = alpha2[:,shared]
             
         K1 = K_list[run1][shared]
         K2 = K_list[run2][shared]
             
-        alpha_diff.append(np.sqrt(((alpha1-alpha2)**2).mean()/(0.5*(alpha1+alpha2).mean())**2))
+        #alpha_diff.append(np.sqrt(((alpha1-alpha2)**2).mean()/(0.5*(alpha1+alpha2).mean())**2))
         K_diff.append(np.sqrt(((K1-K2)**2).mean()/(0.5*(K1+K2).mean())**2))
+print('Overlap and dissimilarity done')
+
 #Compute dissimilarity and overlap for randomized data
 Dlist_null = []
 Olist_null = []
@@ -117,17 +122,19 @@ Olist = np.asarray(Olist)
 Dlist = np.asarray(Dlist)
 Olist_null = np.asarray(Olist_null)
 Dlist_null = np.asarray(Dlist_null)
+print('Null model done')
 
 #Save results
 with open(folder+'DOC_same.dat','wb') as f:
     pickle.dump([pair_save,Olist,Dlist,Olist_null,Dlist_null],f)
 with open(folder+'LV_params.dat','wb') as f:
-    pickle.dump([alpha_diff,K_diff],f)
+    #pickle.dump([alpha_diff,K_diff],f)
+    pickle.dump(K_diff,f)
 
 #################################
 ###Run for distinct body sites###
 #Load data
-with open(folder+'_'.join(['comm']+exp.split(' '))+'S'+str(S)+'.dat','rb') as f:
+with open(folder+'_'.join(['comm']+exp.split(' ')+['S'+str(S)])+'.dat','rb') as f:
     N,R,params,R0,metadata = pickle.load(f)
 #Remove failed runs
 metadata = metadata[np.isnan(N).sum()==0]
@@ -159,6 +166,8 @@ for item in range(len(pairs)):
         Dlist.append(D(x,y,thresh=thresh))
         Olist.append(O(x,y,thresh=thresh))
         pair_save.append(pairs[item])
+print('Distinct sites done')
+
 #Compute dissimilarity and overlap for randomized data
 Dlist_null = []
 Olist_null = []
@@ -182,6 +191,7 @@ Olist = np.asarray(Olist)
 Dlist = np.asarray(Dlist)
 Olist_null = np.asarray(Olist_null)
 Dlist_null = np.asarray(Dlist_null)
+print('Distinct sites null model done')
 
 #Save results
 with open(folder+'DOC_diff.dat','wb') as f:
